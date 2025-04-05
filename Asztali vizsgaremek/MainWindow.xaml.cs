@@ -14,14 +14,15 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MySql.Data.MySqlClient;
 
 namespace Asztali_vizsgaremek;
 
 public partial class MainWindow : Window
 {
 
-    private string connectionString = "Server=localhost;Database=teaching_website_db;Uid=root;Pwd=;";
-    private List<string> tableNames = new List<string> { "admin", "assignment", "student", "teacher", "token", "_studentassignments", "_teacherassignments" };
+    private string connectionString = "server=localhost;user=root;password=;database=teaching_website_db;";
+    private List<string> tableNames = new List<string> { "admin", "assignment", "student", "studentassignment", "teacher", "user"};
 
     public MainWindow()
     {
@@ -50,11 +51,11 @@ public partial class MainWindow : Window
         DataTable dt = new DataTable();
         try
         {
-            using (Microsoft.Data.SqlClient.SqlConnection conn = new Microsoft.Data.SqlClient.SqlConnection(connectionString))
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
-                using (Microsoft.Data.SqlClient.SqlCommand cmd = new Microsoft.Data.SqlClient.SqlCommand($"SELECT * FROM {tableName}", conn))
-                using (Microsoft.Data.SqlClient.SqlDataAdapter adapter = new Microsoft.Data.SqlClient.SqlDataAdapter(cmd))
+                using (MySqlCommand cmd = new MySqlCommand($"SELECT * FROM {tableName}", conn))
+                using (MySqlDataAdapter adapter = new MySqlDataAdapter(cmd))
                 {
                     adapter.Fill(dt);
                 }
