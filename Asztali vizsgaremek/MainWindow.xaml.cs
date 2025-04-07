@@ -72,15 +72,19 @@ public partial class MainWindow : Window
     {
         if (TableSelector.SelectedItem == null) return;
 
-        string tableName = TableSelector.SelectedItem.ToString();
-        DataRowView rowView = e.Row.Item as DataRowView;
-
-        if (rowView != null)
+        Dispatcher.BeginInvoke(new Action(() =>
         {
-            MessageBox.Show(rowView.Row.ToString());
-            UpdateDatabaseRow(tableName, rowView.Row);
-        }
+            string tableName = TableSelector.SelectedItem.ToString();
+            DataRowView rowView = e.Row.Item as DataRowView;
+
+            if (rowView != null)
+            {
+                UpdateDatabaseRow(tableName, rowView.Row);
+            }
+        }), System.Windows.Threading.DispatcherPriority.Background);
     }
+
+
 
     private void UpdateDatabaseRow(string tableName, DataRow row)
     {
