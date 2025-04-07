@@ -67,4 +67,51 @@ public partial class MainWindow : Window
             MessageBox.Show("Error: " + ex.Message);
         }
     }
+
+    private void DataGridDisplay_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
+    {
+        if (TableSelector.SelectedItem == null) return;
+
+        string tableName = TableSelector.SelectedItem.ToString();
+        DataRowView rowView = e.Row.Item as DataRowView;
+
+        if (rowView != null)
+        {
+            MessageBox.Show(rowView.Row.ToString());
+            UpdateDatabaseRow(tableName, rowView.Row);
+        }
+    }
+
+    private void UpdateDatabaseRow(string tableName, DataRow row)
+    {
+        try
+        {
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+
+                var columns = row.Table.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
+
+                string primaryKey = columns[0];
+                object primaryKeyValue = row[primaryKey];
+
+                var setClauses = columns.Skip(1).Select(col => $"{col} = @{col}");
+                string updateQuery = $"UPDATE {tableName} SET {string.Join(", ", setClauses)} WHERE {primaryKey} = @{primaryKey}";
+
+                using (MySqlCommand cmd = new MySqlCommand(updateQuery, conn))
+                {
+                    foreach (string col in columns)
+                    {
+                        cmd.Parameters.AddWithValue($"@{col}", row[col]);
+                    }
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Error updating row: " + ex.Message);
+        }
+    }
 }

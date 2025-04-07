@@ -17,6 +17,11 @@
             <ComboBox x:Name="TableSelector" Width="200" SelectionChanged="TableSelector_SelectionChanged"/>
         </StackPanel>
 
-        <DataGrid x:Name="DataGridDisplay" AutoGenerateColumns="True" Grid.Row="1" Margin="10"/>
+        <DataGrid x:Name="DataGridDisplay"
+          AutoGenerateColumns="True"
+          Grid.Row="1"
+          Margin="10"
+          IsReadOnly="False"
+          RowEditEnding="DataGridDisplay_RowEditEnding"/>
     </Grid>
 </Window>
