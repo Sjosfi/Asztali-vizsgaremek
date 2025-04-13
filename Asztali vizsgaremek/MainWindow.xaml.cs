@@ -64,7 +64,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            MessageBox.Show("Error: " + ex.Message);
+            MessageBox.Show("Hiba: " + ex.Message);
         }
     }
 
@@ -115,7 +115,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            MessageBox.Show("Error updating row: " + ex.Message);
+            MessageBox.Show("Hiba a sor frissítésével: " + ex.Message);
         }
     }
 }
