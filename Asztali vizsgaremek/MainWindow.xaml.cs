@@ -79,7 +79,16 @@ public partial class MainWindow : Window
 
             if (rowView != null)
             {
-                UpdateDatabaseRow(tableName, rowView.Row);
+                DataRow row = rowView.Row;
+
+                if (row.RowState == DataRowState.Added)
+                {
+                    InsertDatabaseRow(tableName, row);
+                }
+                else if (row.RowState == DataRowState.Modified)
+                {
+                    UpdateDatabaseRow(tableName, row);
+                }
             }
         }), System.Windows.Threading.DispatcherPriority.Background);
     }
@@ -116,6 +125,42 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             MessageBox.Show("Hiba a sor frissítésével: " + ex.Message);
+        }
+    }
+
+    private void InsertDatabaseRow(string tableName, DataRow row)
+    {
+        try
+        {
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+
+                var columns = row.Table.Columns.Cast<DataColumn>()
+                    .Select(c => c.ColumnName)
+                    .Skip(1)
+                    .ToList();
+
+                var values = columns.Select(c => $"@{c}");
+                string insertQuery = $"INSERT INTO {tableName} ({string.Join(", ", columns)}) VALUES ({string.Join(", ", values)})";
+
+                using (MySqlCommand cmd = new MySqlCommand(insertQuery, conn))
+                {
+                    foreach (string col in columns)
+                    {
+                        cmd.Parameters.AddWithValue($"@{col}", row[col]);
+                    }
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+
+            MessageBox.Show("Sor sikeresen hozzáadva.");
+            LoadData(tableName);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Hiba az új sor beszúrásakor: " + ex.Message);
         }
     }
 }
